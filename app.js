@@ -6,7 +6,6 @@
   var sdk = require("microsoft-cognitiveservices-speech-sdk");
   var readline = require("readline");
   var pdfUtil = require('pdf-to-text');
-var pdf_path = "./uploads/"+a;
  
 //option to extract text from page 0 to 10
 var option = {from: 0, to: 10};
