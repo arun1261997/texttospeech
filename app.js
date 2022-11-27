@@ -49,7 +49,7 @@ var option = {from: 0, to: 10};
 pdfUtil.pdfToText(pdf_path, function(err, data) {
   if (err) throw(err);
   console.log(data)
-  var subscriptionKey = "61d582f9b2ab43698586d320ee8f637f";
+  var subscriptionKey = "6734af3f166e41e2b26de74f2246a636";
   var serviceRegion = "swedencentral"; // e.g., "westus"
   var filename = "public/YourAudioFile.mp3";
 
@@ -106,8 +106,8 @@ pdfUtil.pdfToText(pdf_path, function(err, data) {
     });  
 });  
   
-app.listen(2000,function(){  
-    console.log("Server is running on port 2000");  
+app.listen(3000,function(){  
+    console.log("Server is running on port 3000");  
 }); 
 
 // (function() {
