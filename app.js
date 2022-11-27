@@ -48,7 +48,7 @@ var option = {from: 0, to: 10};
 //Omit option to extract all text from the pdf file
 pdfUtil.pdfToText(pdf_path, function(err, data) {
   if (err) throw(err);
-
+  console.log(data)
   var subscriptionKey = "61d582f9b2ab43698586d320ee8f637f";
   var serviceRegion = "swedencentral"; // e.g., "westus"
   var filename = "public/YourAudioFile.mp3";
@@ -106,8 +106,8 @@ pdfUtil.pdfToText(pdf_path, function(err, data) {
     });  
 });  
   
-app.listen(3000,function(){  
-    console.log("Server is running on port 3000");  
+app.listen(2000,function(){  
+    console.log("Server is running on port 2000");  
 }); 
 
 // (function() {
