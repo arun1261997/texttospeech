@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
@@ -23,8 +22,5 @@
     "pdf-parse": "^1.1.1",
     "pdf-to-text": "0.0.7",
     "pdfjs-dist": "^3.0.279"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.20"
   }
 }
