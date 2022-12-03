@@ -1,3 +1,34 @@
+var express =   require("express");  
+var multer  =   require('multer');  
+const { basename } = require("path");
+var app =   express(); 
+var audioconcat = require('audioconcat');
+var a 
+
+var storage =   multer.diskStorage({  
+  destination: function (req, file, callback) {  
+    callback(null, './uploads');  
+  },  
+  filename: function (req, file, callback) {  
+    callback(null, file.originalname);  
+    a= file.originalname
+  }  
+});  
+var upload = multer({ storage : storage}).single('myfile');  
+app.use(express.static('public')); 
+app.get('/',function(req,res){  
+      res.sendFile(__dirname + "/index.html");  
+});  
+  
+app.post('/uploadFile',function(req,res){  
+    upload(req,res,function(err) {  
+        if(err) {  
+            return res.end("Error uploading file.");  
+        }  
+        
+
+        // console.log("./uploads/"+a);
+
 (function() {
   // <code>
   "use strict";
@@ -6,6 +37,7 @@
   var sdk = require("microsoft-cognitiveservices-speech-sdk");
   var readline = require("readline");
   var pdfUtil = require('pdf-to-text');
+var pdf_path = "./uploads/"+a;
  
 //option to extract text from page 0 to 10
 var option = {from: 0, to: 10};
@@ -16,49 +48,63 @@ var option = {from: 0, to: 10};
 // });
  
 //Omit option to extract all text from the pdf file
-pdfUtil.pdfToText("bokmaskinen.pdf", function(err, data) {
+pdfUtil.pdfToText(pdf_path, async function(err, data) {
+  var subscriptionKey = "6734af3f166e41e2b26de74f2246a636";
+  var serviceRegion =  req.body.region; // e.g., "westus"
+ 
+var audio =[]
   if (err) throw(err);
-  console.log(data)
-  var subscriptionKey = "61d582f9b2ab43698586d320ee8f637f";
-  var serviceRegion = "swedencentral"; // e.g., "westus"
-  var filename = "public/YourAudioFile.mp3";
+  const chunkSize = 3000;
+  for (let i = 0; i < data.length; i += chunkSize) {
+      const chunk = data.slice(i, i + chunkSize);
+      await speech(chunk,i);
+      
+  }
+  res.send(audio); 
+  async function speech(chunk,i){
 
-  // we are done with the setup
-
-  // now create the audio-config pointing to our stream and
-  // the speech config specifying the language.
-  var audioConfig = sdk.AudioConfig.fromAudioFileOutput(filename);
-  var speechConfig = sdk.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
-   // The language of the voice that speaks.
-   speechConfig.speechSynthesisVoiceName = "hi-IN-MadhurNeural"; 
-  // create the speech synthesizer.
-  var synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
-
-  // var rl = readline.createInterface({
-  //   input: input,
-  //   output: process.stdout
-  // });
-
-
-    // start the synthesizer and wait for a result.
-    synthesizer.speakTextAsync(data,
-        function (result) {
-      if (result.reason === sdk.ResultReason.SynthesizingAudioCompleted) {
-        console.log("synthesis finished.");
-        res.end("File is uploaded successfully!");  
-      } else {
-        console.error("Speech synthesis canceled, " + result.errorDetails +
-            "\nDid you update the subscription info?");
-      }
-      synthesizer.close();
-      synthesizer = undefined;
-    },
-        function (err) {
-      console.trace("err - " + err);
-      synthesizer.close();
-      synthesizer = undefined;
-    });
-    console.log("Now synthesizing to: " + filename); //print all text    
+    var filename = 'public/'+i+"YourAudioFile.mp3";
+  
+    // we are done with the setup
+  
+    // now create the audio-config pointing to our stream and
+    // the speech config specifying the language.
+    var audioConfig = sdk.AudioConfig.fromAudioFileOutput(filename);
+    var speechConfig = sdk.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
+     // The language of the voice that speaks.
+     speechConfig.speechSynthesisVoiceName = req.body.voice; 
+    // create the speech synthesizer.
+    var synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
+  
+    // var rl = readline.createInterface({
+    //   input: input,
+    //   output: process.stdout
+    // });
+  
+  
+      // start the synthesizer and wait for a result.
+      synthesizer.speakTextAsync(chunk,
+          function (result) {
+        if (result.reason === sdk.ResultReason.SynthesizingAudioCompleted) {
+          console.log("synthesis finished.");
+          res.end(filename);  
+        } else {
+          console.error("Speech synthesis canceled, " + result.errorDetails +
+              "\nDid you update the subscription info?");
+        }
+        synthesizer.close();
+        synthesizer = undefined;
+      },
+          function (err) {
+        console.trace("err - " + err);
+        synthesizer.close();
+        synthesizer = undefined;
+      });
+      audio.push(filename);
+      console.log("Now synthesizing to: " + filename); //print all text  
+    // do whatever
+  }
+ 
 });
 
   // replace with your own subscription key,
@@ -69,3 +115,13 @@ pdfUtil.pdfToText("bokmaskinen.pdf", function(err, data) {
   // </code>
   
 }())
+
+
+
+      
+    });  
+});  
+  
+app.listen(3000,function(){  
+    console.log("Server is running on port 3000");  
+}); 
